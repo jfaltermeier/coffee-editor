@@ -1,3 +1,5 @@
+import URI from '@theia/core/lib/common/uri';
+
 export namespace CoffeeModel {
     export namespace Type {
         export const AutomaticTask = "http://www.eclipsesource.com/modelserver/example/coffeemodel#//AutomaticTask";
@@ -21,5 +23,110 @@ export namespace CoffeeModel {
         export const WaterTank = "http://www.eclipsesource.com/modelserver/example/coffeemodel#//WaterTank";
         export const WeightedFlow = "http://www.eclipsesource.com/modelserver/example/coffeemodel#//WeightedFlow";
         export const Workflow = "http://www.eclipsesource.com/modelserver/example/coffeemodel#//Workflow";
+
+        export function name(type: string): string {
+            return new URI(type).fragment.substring(2);
+        }
+    }
+
+    const components = [
+        Type.Component,
+        Type.Machine,
+        Type.ControlUnit,
+        Type.BrewingUnit,
+        Type.DipTray,
+        Type.WaterTank
+    ];
+
+    const nodes = [
+        Type.AutomaticTask,
+        Type.Decision,
+        Type.Fork,
+        Type.Join,
+        Type.ManualTask,
+        Type.Merge
+    ];
+
+    const flows = [
+        Type.Flow,
+        Type.WeightedFlow
+    ];
+
+    /** Maps types to their creatable children */
+    export const childrenMapping: Map<string, ChildrenDescriptor[]> = new Map([
+        [
+            Type.BrewingUnit, [
+                {
+                    property: 'children',
+                    children: components
+                }
+            ]
+        ],
+        [
+            Type.Component, [
+                {
+                    property: 'children',
+                    children: components
+                },
+                {
+                    property: 'workflows',
+                    children: [Type.Workflow]
+                }
+            ]
+        ],
+        [
+            Type.ControlUnit, [
+                {
+                    property: 'children',
+                    children: components
+                }
+            ]
+        ],
+        [
+            Type.DipTray, [
+                {
+                    property: 'children',
+                    children: components
+                }
+            ]
+        ],
+        [
+            Type.Machine, [
+                {
+                    property: 'children',
+                    children: components
+                },
+                {
+                    property: 'workflows',
+                    children: [Type.Workflow]
+                }
+            ]
+        ],
+        [
+            Type.WaterTank, [
+                {
+                    property: 'children',
+                    children: components
+                }
+            ]
+        ],
+        [
+            Type.Workflow, [
+                {
+                    property: 'flows',
+                    children: flows
+                },
+                {
+                    property: 'nodes',
+                    children: nodes
+                }
+            ]
+        ],
+    ]);
+
+
+    export interface ChildrenDescriptor {
+        property: string;
+        children: string[];
     }
 }
